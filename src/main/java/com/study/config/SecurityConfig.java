@@ -1,2 +1,38 @@
-package com.study.config;public class SecurityConfig {
+package com.study.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+/*
+*@EnableWebSecurity
+* 웹 보안 기능을 활성화하려는 클래스에 추가
+* 보통 @Configuration 같이 사용
+* */
+@EnableWebSecurity
+public class SecurityConfig {
+
+    /**
+     * SecurityFilterChain
+     * WebSecurityConfigurerAdapter deprecated 되어 SecurityFilterChain 사용
+     * antMatchers(), mvcMatchers(), regexMatchers() -> requestMatchers() (또는 securityMatchers())로 변경
+     * authorizeRequests() -> authorizeHttpRequests() 로 변경
+     * 람다식으로 변경
+     */
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+             //authorizeHttpRequests: HTTP 요청에 대한 접근 권한을 설정하는 데 사용
+        http.authorizeHttpRequests((auth) -> auth
+                .requestMatchers("/", "/login","/sign-up","/check-email",
+                "/check-email-token","/email-login","/check-email-login","/login-link").permitAll()
+                .requestMatchers(HttpMethod.GET, "/profile/").permitAll()
+                .anyRequest().authenticated()
+        );
+
+        return http.build();
+    }
 }
