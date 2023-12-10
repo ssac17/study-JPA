@@ -31,6 +31,7 @@ class SecurityConfigTest {
                 .andExpect(status().isOk())
                 //view: view 이름 검증
                 .andExpect(view().name("account/sign-up"));
-    }
 
+
+    }
 }

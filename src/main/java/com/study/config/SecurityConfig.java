@@ -1,10 +1,13 @@
 package com.study.config;
 
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -35,4 +38,15 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+    /**
+     * WebSecurityConfigurerAdapter deprecated 되어 SecurityFilterChain 사용
+     * WebSecurity -> WebSecurityCustomizer로 대체
+     */
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+                        //static리소스는 접근 허용(무시)
+        return (web) -> web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+    }
+
 }
