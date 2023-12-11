@@ -66,8 +66,7 @@ public class AccountController {
             return view;
         }
 
-        account.setEmailVerified(true);
-        account.setJoinedAt(LocalDateTime.now());      //count(): JPA에 기본 정의된 메서드
+        account.completeSignUp();         //count(): JPA에 기본 정의된 메서드
         model.addAttribute("numberOfUser", accountRepository.count());
         model.addAttribute("nickname", account.getNickname());
         return view;
