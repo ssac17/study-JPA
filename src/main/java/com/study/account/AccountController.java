@@ -1,11 +1,27 @@
 package com.study.account;
 
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PostMapping;
+
 
 @Controller
+@RequiredArgsConstructor
 public class AccountController {
+
+    private final SignUpFormValidator signUpFormValidator;
+
+    //@InitBinder: 웹 요청 파라미터를 자바 객체에 바인딩하는 과정을 커스터마이징하려는 경우
+    @InitBinder("signUpForm")//WebDataBinder 로 웹의 파라미터를 받음
+    public void initBinder(WebDataBinder webDataBinder) {
+        webDataBinder.addValidators(signUpFormValidator);
+    }
 
     @GetMapping("/sign-up")
     public String signupForm(Model model) {
@@ -13,4 +29,13 @@ public class AccountController {
         model.addAttribute("signUpForm", new SignUpForm());
         return "account/sign-up";
     }
+
+    @PostMapping("/sign-up")
+    public String signUpSubmit(@Valid SignUpForm signUpForm, Errors error) {
+        if(error.hasErrors()) {
+            return "account/sign-up";
+        }
+
+        return "redirect:/";
+     }
 }
