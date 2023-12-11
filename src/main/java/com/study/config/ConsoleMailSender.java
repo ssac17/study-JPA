@@ -1,4 +1,4 @@
-package com.study;
+package com.study.config;
 
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;

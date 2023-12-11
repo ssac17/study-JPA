@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.time.LocalDateTime;
+
 
 @Controller
 @RequiredArgsConstructor
@@ -21,6 +23,7 @@ public class AccountController {
 
     private final SignUpFormValidator signUpFormValidator;
     private final AccountService accountService;
+    private final AccountRepository accountRepository;
 
 
     //@InitBinder: 웹 요청 파라미터를 자바 객체에 바인딩하는 과정을 커스터마이징하려는 경우
@@ -43,5 +46,30 @@ public class AccountController {
         }
         accountService.processNewAccount(signUpForm);
         return "redirect:/";
+     }
+
+     @GetMapping("/check-email-token")
+    private String checkEmailToken(String token, String email, Model model) {
+
+        Account account = accountRepository.findByEmail(email);
+        String view = "account/checked-email";
+
+        //계정이 없을경우
+        if(account == null) {
+            model.addAttribute("error", "wrong email");
+            return view;
+        }
+
+        //token 일치여부 확인
+        if(!account.getEmailCheckToken().equals(token)) {
+            model.addAttribute("error", "wrong token");
+            return view;
+        }
+
+        account.setEmailVerified(true);
+        account.setJoinedAt(LocalDateTime.now());      //count(): JPA에 기본 정의된 메서드
+        model.addAttribute("numberOfUser", accountRepository.count());
+        model.addAttribute("nickname", account.getNickname());
+        return view;
      }
 }

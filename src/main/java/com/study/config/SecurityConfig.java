@@ -5,10 +5,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -31,7 +29,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
              //authorizeHttpRequests: HTTP 요청에 대한 접근 권한을 설정하는 데 사용
         http.authorizeHttpRequests((auth) -> auth
-                .requestMatchers("/", "/login","/sign-up","/check-email",
+                .requestMatchers("/", "/login","/sign-up","/checked-email",
                 "/check-email-token","/email-login","/check-email-login","/login-link").permitAll()
                 .requestMatchers(HttpMethod.GET, "/profile/").permitAll()
                 .anyRequest().authenticated()
