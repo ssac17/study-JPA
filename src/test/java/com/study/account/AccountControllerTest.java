@@ -1,6 +1,7 @@
 package com.study.account;
 
 import com.study.domain.Account;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,13 +11,18 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
+import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 
 
@@ -48,7 +54,9 @@ class AccountControllerTest {
                 .param("email", "ghkdgksmf13@naver.com"))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("error"))
-                .andExpect(view().name("account/checked-email"));
+                .andExpect(view().name("account/checked-email"))
+                .andExpect(unauthenticated());
+        ;
     }
 
     @Test
@@ -56,11 +64,12 @@ class AccountControllerTest {
     void checkEmailToken() throws Exception {
 
         String email = "ghkdgksmf13@naver.com";
-        String password = "2d342rwsd";
+        String password = "12345678";
+        String n = "sky";
         Account account = Account.builder()
                 .email(email)
                 .password(password)
-                .nickname("sky")
+                .nickname(n)
                 .build();
 
         Account newAccount = accountRepository.save(account);
@@ -73,21 +82,34 @@ class AccountControllerTest {
                 .andExpect(model().attributeDoesNotExist("error"))
                 .andExpect(model().attributeExists("nickname"))
                 .andExpect(model().attributeExists("numberOfUser"))
-                .andExpect(view().name("account/checked-email"));
+                .andExpect(view().name("account/checked-email"))
+                .andExpect(authenticated().withUsername(n));
     }
 
+
+    @Test
+    @DisplayName("회원 가입 화면 보이는지 테스트")
+    void signUpForm() throws Exception {
+        mockMvc.perform(get("/sign-up"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(view().name("account/sign-up"))
+                .andExpect(model().attributeExists("signUpForm"))
+                .andExpect(unauthenticated());
+    }
 
 
     @Test
     @DisplayName("회원 가입 처리 - 입력값 오류")
     void signUpSubmitTest_withWorngInput() throws Exception{
         mockMvc.perform(post("/sign-up")
-                .param("nickname", "sky")
-                .param("email", "ghkdkgksmf!.ad")
-                .param("password", "1dd"))
+                        .param("nickname", "sky")
+                        .param("email", "ghkdgksmf13@naver.com")
+                        .param("password", "1dd")
+                        .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("account/sign-up"));
-
+                .andExpect(view().name("account/sign-up"))
+                .andExpect(unauthenticated());
     }
 
     @Test
@@ -97,12 +119,16 @@ class AccountControllerTest {
         mockMvc.perform(post("/sign-up")
                         .param("nickname", "sky")
                         .param("email", mail)
-                        .param("password", "1dd3sd3td"))
+                        .param("password", "1dd3sd3td")
+                        .with(csrf()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/"));
+                .andExpect(view().name("redirect:/"))
+                .andExpect(authenticated().withUsername("sky"));
 
-        assertTrue(accountRepository.existsByEmail(mail));
+        Account account = accountRepository.findByEmail(mail);
+        assertNotNull(account);
+        assertNotEquals(account.getPassword(), "1dd3sd3td");
+        assertNotNull(account.getEmailCheckToken());
         then(javaMailSender).should().send(any(SimpleMailMessage.class));
-
     }
 }

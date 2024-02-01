@@ -44,11 +44,13 @@ public class AccountController {
         if(error.hasErrors()) {
             return "account/sign-up";
         }
-        accountService.processNewAccount(signUpForm);
+        //메일인증 성공 후 로그인 처리
+        Account account = accountService.processNewAccount(signUpForm);
+        accountService.login(account);
         return "redirect:/";
      }
 
-     @GetMapping("/check-email-token")
+    @GetMapping("/check-email-token")
     private String checkEmailToken(String token, String email, Model model) {
 
         Account account = accountRepository.findByEmail(email);
@@ -61,12 +63,14 @@ public class AccountController {
         }
 
         //token 일치여부 확인
-        if(!account.getEmailCheckToken().equals(token)) {
+        if(!account.isValidToken(token)) {
             model.addAttribute("error", "wrong token");
             return view;
         }
 
         account.completeSignUp();         //count(): JPA에 기본 정의된 메서드
+        System.out.println("!!!!!!!! "+account .getJoinedAt());
+        accountService.login(account);
         model.addAttribute("numberOfUser", accountRepository.count());
         model.addAttribute("nickname", account.getNickname());
         return view;

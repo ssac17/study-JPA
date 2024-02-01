@@ -30,12 +30,14 @@ public class SecurityConfig {
              //authorizeHttpRequests: HTTP 요청에 대한 접근 권한을 설정하는 데 사용
         http.authorizeHttpRequests((auth) -> auth
                 .requestMatchers("/", "/login","/sign-up","/checked-email",
-                "/check-email-token","/email-login","/check-email-login","/login-link").permitAll()
+                "/check-email-token","/email-login","/check-email-login","/login-link", "/node_modules/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/profile/").permitAll()
                 .anyRequest().authenticated()
         );
         //csrf처리
         http.csrf((csrf) -> csrf.disable());
+
+        http.securityContext((securityContext) -> securityContext.requireExplicitSave(false));
 
         return http.build();
     }
@@ -47,7 +49,6 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
                         //static리소스는 접근 허용(무시)
-        return (web) -> web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+        return web -> web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
-
 }

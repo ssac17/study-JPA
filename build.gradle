@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.2.0'
 	id 'io.spring.dependency-management' version '1.1.4'
+	id 'com.github.node-gradle.node' version '3.4.0'
 }
 
 group = 'com.study'
@@ -19,6 +20,29 @@ configurations {
 
 repositories {
 	mavenCentral()
+}
+
+
+//node {
+//	version = '20.9.0'  // Node 버전을 지정해주세요.
+//	npmVersion = '10.1.0' // npm 버전을 지정해주세요.
+//	download = true
+//	workDir = file("${project.buildFile}/nodejs")
+//	nodeModulesDir = file("${project.projectDir}")
+//}
+
+node {
+	download = true
+	version = '20.9.0'  // Node 버전을 지정해주세요.
+	npmVersion = '10.1.0' // npm 버전을 지정해주세요.
+	distBaseUrl = "https://nodejs.org/dist"
+	allowInsecureProtocol = null
+	npmInstallCommand = "install"
+	workDir = file("${project.projectDir}/.gradle/nodejs")
+	npmWorkDir = file("${project.projectDir}/.gradle/npm")
+	yarnWorkDir = file("${project.projectDir}/.gradle/yarn")
+	nodeProjectDir = file("${project.projectDir}/src/main/resources/static")
+	nodeProxySettings = ProxySettings.SMART
 }
 
 dependencies {
@@ -48,3 +72,22 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+task customNpmInstall(type: NpmTask, dependsOn: 'npmSetup') {
+	args = ['install']
+}
+task copyFrontend(type: Copy, dependsOn: customNpmInstall) {
+	from "${project.projectDir}/node_modules"
+	into "${project.projectDir}/src/main/resources/static"
+}
+
+//build.dependsOn copyFrontend
+//build.dependsOn customNpmInstall
+
+processResources.dependsOn('npmInstall')
+
+
+
+
+
+
