@@ -81,9 +81,6 @@ task copyFrontend(type: Copy, dependsOn: customNpmInstall) {
 	into "${project.projectDir}/src/main/resources/static"
 }
 
-//build.dependsOn copyFrontend
-//build.dependsOn customNpmInstall
-
 processResources.dependsOn('npmInstall')
 
 
