@@ -4,6 +4,7 @@ import com.study.domain.Account;
 import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 
 @Controller
 @RequiredArgsConstructor
+@Log4j2
 public class AccountController {
 
 
@@ -36,21 +38,21 @@ public class AccountController {
 
     @GetMapping("/sign-up")
     private String signupForm(Model model) {
-                                       //카멜케이스로 작성하면 생략 가능, new SignUpForm()만 작성해도 됨
+        //카멜케이스로 작성하면 생략 가능, new SignUpForm()만 작성해도 됨
         model.addAttribute("signUpForm", new SignUpForm());
         return "account/sign-up";
     }
 
     @PostMapping("/sign-up")
     public String signUpSubmit(@Valid SignUpForm signUpForm, Errors error) {
-        if(error.hasErrors()) {
+        if (error.hasErrors()) {
             return "account/sign-up";
         }
         //메일인증 성공 후 로그인 처리
         Account account = accountService.processNewAccount(signUpForm);
         accountService.login(account);
         return "redirect:/";
-     }
+    }
 
     @GetMapping("/check-email-token")
     private String checkEmailToken(String token, String email, Model model) {
@@ -58,24 +60,25 @@ public class AccountController {
         String view = "account/checked-email";
 
         //계정이 없을경우
-        if(account == null) {
+        if (account == null) {
             model.addAttribute("error", "wrong email");
             return view;
         }
-
         //token 일치여부 확인
-        if(!account.isValidToken(token)) {
+        if (!account.isValidToken(token)) {
             model.addAttribute("error", "wrong token");
             return view;
         }
-        account.completeSignUp();         //count(): JPA에 기본 정의된 메서드
 
-        accountService.login(account);
+        accountService.completeSignUp(account);
+
+                                                        //count(): JPA에 기본 정의된 메서드
         model.addAttribute("numberOfUser", accountRepository.count());
         model.addAttribute("nickname", account.getNickname());
         model.addAttribute("email", account.getEmail());
         return view;
     }
+
     @GetMapping("/check-email")
     public String checkEmailPage(@CurrentUser Account account, Model model) {
 
@@ -86,11 +89,24 @@ public class AccountController {
 
 
     @GetMapping("/resend/confirm-email")
-    public String resendMail(@CurrentUser Account account, Model model){
+    public String resendMail(@CurrentUser Account account, Model model) {
         accountService.sendSignUpConfirmEmail(account);
         return "redirect:/";
     }
 
+    @GetMapping("/profile/{nickname}")
+    public String viewProfile(@PathVariable("nickname") String nickname, Model model, @CurrentUser Account account) {
+        log.info("--- viewProfile ---");
+        log.info("nickname = {}", nickname);
+        Account byNickname = accountRepository.findByNickname(nickname);
+        if(byNickname == null) {
+            throw  new IllegalArgumentException(nickname);
+        }
+        model.addAttribute(byNickname);
+        model.addAttribute("isOwner", byNickname.equals(account));
 
-    
+        return "account/profile";
+    }
+
 }
+
