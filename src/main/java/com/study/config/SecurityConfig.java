@@ -28,8 +28,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
              //authorizeHttpRequests: HTTP 요청에 대한 접근 권한을 설정하는 데 사용
+
+        http.formLogin(page -> page.loginPage("/login").permitAll());
+        http.logout(logout -> logout.logoutSuccessUrl("/"));
+
         http.authorizeHttpRequests((auth) -> auth
-                .requestMatchers("/", "/login","/sign-up","/checked-email",
+                .requestMatchers("/", "/login","/sign-up",
                 "/check-email-token","/email-login","/check-email-login","/login-link", "/node_modules/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/profile/").permitAll()
                 .anyRequest().authenticated()

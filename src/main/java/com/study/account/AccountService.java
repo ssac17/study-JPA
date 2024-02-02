@@ -6,8 +6,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +20,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class AccountService {
+public class AccountService implements UserDetailsService {
 
     private final AccountRepository accountRepository;
     private final JavaMailSender javaMailSender;
@@ -58,13 +62,26 @@ public class AccountService {
 
         //사용자 인증정보를 담은 객체
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                        account.getNickname(),
+                        new UserAccount(account),
                         account.getPassword(),      // 권한 부여
                         List.of(new SimpleGrantedAuthority("ROLE USER")));
         //SecurityContextHolder: 현재 스레드의 보안 컨텍스트를 저장하는 데 사용되는 객체
         //getContext()로 SecurityContext에 담음
 
         SecurityContextHolder.getContext().setAuthentication(token);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String EmailOrNickname) throws UsernameNotFoundException {
+        Account account = accountRepository.findByEmail(EmailOrNickname);
+        if(account == null) {
+            account = accountRepository.findByNickname(EmailOrNickname);
+        }
+        if(account == null) {
+            throw new UsernameNotFoundException(EmailOrNickname);
+        }
+
+        return new UserAccount(account);
     }
 }
 

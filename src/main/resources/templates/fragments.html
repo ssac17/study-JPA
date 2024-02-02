@@ -63,7 +63,7 @@
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="#" th:href="@{/settings/profile}">설정</a>
                     <form class="form-inline my-2 my-lg-0" action="#" th:action="@{/logout}" method="post">
-                        <button class="dropdown-item" type="button">로그아웃</button>
+                        <button class="dropdown-item" type="submit">로그아웃</button>
                     </form>
                 </div>
             </li>
@@ -77,3 +77,21 @@
         <small class="d-block mb-3 text-muted">2024</small>
     </div>
 </footer>
+<script type="application/javascript" th:fragment="from-vaildation">
+    (function () {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName("needs-validation");
+
+            Array.prototype.filter.call(forms, function (form) {
+                form.addEventListener("submit", function (event) {
+                    if(form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add("was-validated")
+                }, false)
+            })
+        }, false)
+    })
+</script>

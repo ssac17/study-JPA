@@ -2,18 +2,18 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://thymeleaf.org/extras/spring-security">
-<head th:replace="fragments.html :: head"></head>
+<head th:replace="~{fragments.html :: head}"></head>
 <body class="bg-light">
-    <div th:replace="fragments.html :: main-nav"></div>
-    <div class="alert alert-warning" role="alert" th:i="${account != null && !account.emailVerified}">
-        스터디가자에 가입하시려면 <a href="@{/check-email}" class="alert-link"> 계정 인증 이메일 확인</a> 하세요.
+    <div th:replace="~{fragments.html :: main-nav}"></div>
+    <div class="alert alert-warning" role="alert" th:if="${account != null && !account.emailVerified}">
+        스터디가자에 가입하시려면 <a th:href="@{/check-email}" class="alert-link"> 계정 인증 이메일 확인</a> 하세요.
     </div>
 
     <div class="container">
         <div class="py-5 text-center">
-            <h2>스터디 가자</h2>
+            <h2>스터디 갈래</h2>
         </div>
-        <footer th:replace="fragments.html :: footer" ></footer>
+        <footer th:replace="~{fragments.html :: footer}"></footer>
     </div>
 </body>
 </html>

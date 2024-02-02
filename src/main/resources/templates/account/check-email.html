@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head th:replace="~{fragments.html :: head}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments.html :: main-nav}"></div>
+<div class="py-5 text-center" th:if="${error}">
+    <p class="lead">스터디 이메일 확인</p>
+    <div class="alert alert-danger" role="alert">
+        이메일 확인 링크가 정확하지 않습니다.
+    </div>
+</div>
+<div class="py-5 text-center" th:if="${error == null}">
+    <p class="lead">스터디갈래 이메일 확인</p>
+    <h2>
+        스터디갈래 서비스를 사용하시려면 이메일 인증을 해주세요.
+    </h2>
+    <small class="text-info" th:text="${email}"></small>
+    <div>
+        <a class="btn btn-outline-info" th:href="@{/resend/confirm-email}">인증 이메일 다시 보내기</a>
+    </div>
+</div>
+<footer th:replace="~{fragments.html :: footer}"></footer>
+</body>
+</html>

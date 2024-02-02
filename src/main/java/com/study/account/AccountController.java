@@ -2,6 +2,7 @@ package com.study.account;
 
 import com.study.domain.Account;
 import jakarta.validation.Valid;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -11,6 +12,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.time.LocalDateTime;
@@ -52,7 +54,6 @@ public class AccountController {
 
     @GetMapping("/check-email-token")
     private String checkEmailToken(String token, String email, Model model) {
-
         Account account = accountRepository.findByEmail(email);
         String view = "account/checked-email";
 
@@ -67,12 +68,29 @@ public class AccountController {
             model.addAttribute("error", "wrong token");
             return view;
         }
-
         account.completeSignUp();         //count(): JPA에 기본 정의된 메서드
-        System.out.println("!!!!!!!! "+account .getJoinedAt());
+
         accountService.login(account);
         model.addAttribute("numberOfUser", accountRepository.count());
         model.addAttribute("nickname", account.getNickname());
+        model.addAttribute("email", account.getEmail());
         return view;
-     }
+    }
+    @GetMapping("/check-email")
+    public String checkEmailPage(@CurrentUser Account account, Model model) {
+
+        String view = "account/check-email";
+        model.addAttribute("email", account.getEmail());
+        return view;
+    }
+
+
+    @GetMapping("/resend/confirm-email")
+    public String resendMail(@CurrentUser Account account, Model model){
+        accountService.sendSignUpConfirmEmail(account);
+        return "redirect:/";
+    }
+
+
+    
 }
