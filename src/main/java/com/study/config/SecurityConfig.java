@@ -1,5 +1,7 @@
 package com.study.config;
 
+import com.study.account.AccountService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,7 +9,14 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.RememberMeServices;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
+
+import javax.sql.DataSource;
 
 @Configuration
 /*
@@ -16,7 +25,11 @@ import org.springframework.security.web.SecurityFilterChain;
 * 보통 @Configuration 같이 사용
 * */
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final AccountService accountService;
+    private final DataSource dataSource;
 
     /**
      * SecurityFilterChain
@@ -29,28 +42,39 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
              //authorizeHttpRequests: HTTP 요청에 대한 접근 권한을 설정하는 데 사용
 
-        http.formLogin(page -> page.loginPage("/login").permitAll());
-        http.logout(logout -> logout.logoutSuccessUrl("/"));
+        http
+                .formLogin(page -> page.loginPage("/login").permitAll())
+                .logout(logout -> logout.logoutSuccessUrl("/"))
 
-        http.authorizeHttpRequests((auth) -> auth
-                .requestMatchers("/", "/login","/sign-up",
-                "/check-email-token","/email-login","/check-email-login","/login-link", "/node_modules/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/profile/").permitAll()
-                .anyRequest().authenticated()
-        );
-        //csrf처리
-        http.csrf((csrf) -> csrf.disable());
+                .rememberMe(remember -> remember.rememberMeParameter("rememberMe"))
+                    .userDetailsService(accountService)
 
-        http.securityContext((securityContext) -> securityContext.requireExplicitSave(false));
+            .authorizeHttpRequests((auth) -> auth
+                    .requestMatchers("/", "/login","/sign-up",
+                    "/check-email-token","/email-login","/check-email-login","/login-link", "/node_modules/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/profile/").permitAll()
+                    .anyRequest().authenticated()
+        )
+            //csrf처리
+            .csrf((csrf) -> csrf.disable())
+
+            .securityContext((securityContext) -> securityContext.requireExplicitSave(false));
 
         return http.build();
+    }
+
+    @Bean
+    public PersistentTokenRepository tokenRepository() {
+        JdbcTokenRepositoryImpl jdbcTokenRepository = new JdbcTokenRepositoryImpl();
+        jdbcTokenRepository.setDataSource(dataSource);
+        return jdbcTokenRepository;
     }
 
     /**
      * WebSecurityConfigurerAdapter deprecated 되어 SecurityFilterChain 사용
      * WebSecurity -> WebSecurityCustomizer로 대체
      */
-    @Bean
+     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
                         //static리소스는 접근 허용(무시)
         return web -> web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
