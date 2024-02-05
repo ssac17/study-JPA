@@ -1,6 +1,7 @@
 package com.study.account;
 
 import com.study.domain.Account;
+import com.study.settings.Profile;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
@@ -89,6 +90,14 @@ public class AccountService implements UserDetailsService {
     public void completeSignUp(Account account) {
         account.completeSignUp();
         login(account);
+    }
+
+    public void updateProfile(Account account, Profile profile) {
+        account.setUrl(profile.getUrl());
+        account.setBio(profile.getBio());
+        account.setOccupation(profile.getOccupation());
+        account.setLocation(profile.getLocation());
+        accountRepository.save(account);
     }
 }
 
