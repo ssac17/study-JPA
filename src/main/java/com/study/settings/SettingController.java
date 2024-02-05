@@ -5,6 +5,7 @@ import com.study.account.CurrentUser;
 import com.study.domain.Account;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequiredArgsConstructor
+@Log4j2
 public class SettingController {
     static final String SETTINGS_PROFILE_VIEW_NAME = "settings/profile";
     static final String SETTINGS_PROFILE_URL = "/settings/profile";
@@ -33,7 +35,8 @@ public class SettingController {
     @PostMapping(SETTINGS_PROFILE_URL)
     public String updateProfile(@CurrentUser Account account, @Valid @ModelAttribute Profile profile,
                                 Errors errors, Model model, RedirectAttributes attributes) {
-
+        log.info("---- updateProfile ----");
+        log.info(SETTINGS_PROFILE_URL);
         if(errors.hasErrors()) {
             model.addAttribute(account);
             return SETTINGS_PROFILE_VIEW_NAME;
@@ -41,7 +44,7 @@ public class SettingController {
 
         accountService.updateProfile(account, profile);
         attributes.addFlashAttribute("message", "수정이 완료되었습니다.");
-        return "redirect:" + SETTINGS_PROFILE_VIEW_NAME;
+        return "redirect:/" + SETTINGS_PROFILE_VIEW_NAME;
     }
 
 }
