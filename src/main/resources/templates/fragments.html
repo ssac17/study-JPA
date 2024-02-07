@@ -98,8 +98,6 @@
 
             Array.prototype.filter.call(forms, function (form) {
                 form.addEventListener("submit", function (event) {
-                    console.log(form);
-                    console.log(event);
                     if(form.checkValidity() === false) {
                         event.preventDefault();
                         event.stopPropagation();

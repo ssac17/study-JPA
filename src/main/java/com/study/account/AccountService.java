@@ -1,6 +1,7 @@
 package com.study.account;
 
 import com.study.domain.Account;
+import com.study.settings.Notifications;
 import com.study.settings.Profile;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -103,6 +104,16 @@ public class AccountService implements UserDetailsService {
 
     public void updatePassword(Account account, String newPassword) {
         account.setPassword(passwordEncoder.encode(newPassword));
+        accountRepository.save(account);
+    }
+
+    public void updateNotifications(Account account, Notifications notifications) {
+        account.setStudyCreateByEmail(notifications.isStudyCreatedByEmail());
+        account.setStudyCreateByWeb(notifications.isStudyCreatedByWeb());
+        account.setStudyEnrollmentResultByEmail(notifications.isStudyEnrollmentResultByEmail());
+        account.setStudyEnrollmentResultByWeb(notifications.isStudyEnrollmentResultByWeb());
+        account.setStudyUpdateByEmail(notifications.isStudyUpdateByEmail());
+        account.setStudyUpdateByWeb(notifications.isStudyUpdateByWeb());
         accountRepository.save(account);
     }
 }
