@@ -6,6 +6,7 @@ import com.study.domain.Account;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -21,6 +22,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Log4j2
 public class SettingController {
 
+    private final AccountService accountService;
+    private final ModelMapper modelMapper;
+
     static final String PRIFIX_REDIRECT_URL = "redirect:/";
     static final String SETTINGS_PROFILE_URL = "/settings/profile";
     static final String SETTINGS_PROFILE_VIEW_NAME = "settings/profile";
@@ -28,8 +32,6 @@ public class SettingController {
     static final String SETTINGS_PASSWORD_VIEW_NAME = "settings/password";
     static final String SETTINGS_NOTIFICATIONS_URL = "/settings/notifications";
     static final String SETTINGS_NOTIFICATIONS_VIEW_NAME = "settings/notifications";
-
-    private final AccountService accountService;
 
     @InitBinder("passwordForm")
     public void initBinder(WebDataBinder webDataBinder) {
@@ -40,7 +42,7 @@ public class SettingController {
     public String profileUpdateForm(@CurrentUser Account account, Model model) {
 
         model.addAttribute(account);
-        model.addAttribute(new Profile(account));
+        model.addAttribute(modelMapper.map(account, Profile.class));
 
         return SETTINGS_PROFILE_VIEW_NAME;
     }
@@ -86,7 +88,7 @@ public class SettingController {
     public String updateNotificationsFrom(@CurrentUser Account account, Model model) {
 
         model.addAttribute(account);
-        model.addAttribute(new Notifications(account));
+        model.addAttribute(modelMapper.map(account, Notifications.class));
 
         return SETTINGS_NOTIFICATIONS_VIEW_NAME;
     }

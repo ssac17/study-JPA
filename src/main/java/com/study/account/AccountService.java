@@ -5,10 +5,10 @@ import com.study.settings.Notifications;
 import com.study.settings.Profile;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,6 +28,7 @@ public class AccountService implements UserDetailsService {
     private final AccountRepository accountRepository;
     private final JavaMailSender javaMailSender;
     private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
     @Transactional
     public Account processNewAccount(SignUpForm signUpForm) {
@@ -44,8 +45,8 @@ public class AccountService implements UserDetailsService {
                 .nickname(signUpForm.getNickname())
                 .password(passwordEncoder.encode(signUpForm.getPassword()))
                 .studyEnrollmentResultByWeb(true)
-                .studyCreateByWeb(true)
-                .studyUpdateByWeb(true)
+                .studyCreatedByWeb(true)
+                .studyUpdatedByWeb(true)
                 .build();
         return accountRepository.save(account);
     }
@@ -94,11 +95,7 @@ public class AccountService implements UserDetailsService {
     }
 
     public void updateProfile(Account account, Profile profile) {
-        account.setUrl(profile.getUrl());
-        account.setBio(profile.getBio());
-        account.setOccupation(profile.getOccupation());
-        account.setLocation(profile.getLocation());
-        account.setProfileImage(profile.getProfileImage());
+        modelMapper.map(profile, account);
         accountRepository.save(account);
     }
 
@@ -108,12 +105,7 @@ public class AccountService implements UserDetailsService {
     }
 
     public void updateNotifications(Account account, Notifications notifications) {
-        account.setStudyCreateByEmail(notifications.isStudyCreatedByEmail());
-        account.setStudyCreateByWeb(notifications.isStudyCreatedByWeb());
-        account.setStudyEnrollmentResultByEmail(notifications.isStudyEnrollmentResultByEmail());
-        account.setStudyEnrollmentResultByWeb(notifications.isStudyEnrollmentResultByWeb());
-        account.setStudyUpdateByEmail(notifications.isStudyUpdateByEmail());
-        account.setStudyUpdateByWeb(notifications.isStudyUpdateByWeb());
+        modelMapper.map(notifications, account);
         accountRepository.save(account);
     }
 }

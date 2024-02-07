@@ -51,17 +51,17 @@ public class Account {
     @Lob @Basic(fetch = FetchType.EAGER)
     private String profileImage;
 
-    private boolean studyCreateByEmail;
+    private boolean studyCreatedByEmail;
 
-    private boolean studyCreateByWeb = true;
+    private boolean studyCreatedByWeb = true;
 
     private boolean studyEnrollmentResultByEmail;
 
     private boolean studyEnrollmentResultByWeb = true;
 
-    private boolean studyUpdateByEmail;
+    private boolean studyUpdatedByEmail;
 
-    private boolean studyUpdateByWeb = true;
+    private boolean studyUpdatedByWeb = true;
 
     public void generateEmailCheckToken() {
         this.emailCheckToken = UUID.randomUUID().toString();
