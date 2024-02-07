@@ -1,8 +1,8 @@
 package com.study.account;
 
 import com.study.domain.Account;
-import com.study.settings.Notifications;
 import com.study.settings.Profile;
+import com.study.settings.form.Notifications;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -104,9 +104,15 @@ public class AccountService implements UserDetailsService {
         accountRepository.save(account);
     }
 
-    public void updateNotifications(Account account, Notifications notifications) {
+    public void updateNotifications(Account account, @Valid Notifications notifications) {
         modelMapper.map(notifications, account);
         accountRepository.save(account);
+    }
+
+    public void updateNickname(Account account, String nickname) {
+        account.setNickname(nickname);
+        accountRepository.save(account);
+        login(account);
     }
 }
 
