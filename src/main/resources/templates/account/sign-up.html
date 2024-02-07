@@ -55,5 +55,12 @@
         <footer th:replace="~{fragments.html :: footer}"></footer>
     </div>
 <script type="application/javascript" th:replace="~{fragments.html :: from-vaildation}"></script>
+<script type="application/javascript">
+    $(window).on("load", function () {
+        $("#nickname").val("sky");
+        $("#email").val("ghkdgksmf13@naver.com");
+        $("#password").val("123123123");
+    })
+</script>
 </body>
 </html>
