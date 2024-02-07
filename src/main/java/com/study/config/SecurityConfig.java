@@ -50,7 +50,7 @@ public class SecurityConfig {
                     .userDetailsService(accountService)
 
             .authorizeHttpRequests((auth) -> auth
-                    .requestMatchers("/", "/login","/sign-up",
+                    .requestMatchers("/", "/login","/sign-up", "/login-by-email",
                     "/check-email-token","/email-login","/check-email-login","/login-link", "/node_modules/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/profile/").permitAll()
                     .anyRequest().authenticated()
