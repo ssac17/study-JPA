@@ -1,6 +1,8 @@
 package com.study.account;
 
 import com.study.domain.Account;
+import com.study.email.EmailMessage;
+import com.study.email.EmailService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -8,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -43,7 +43,7 @@ class AccountControllerTest {
     * Spring 테스트 컨텍스트 내에서 특정 빈(bean)을 Mockito mock으로 대체하도록 지정하는 역할
     * */
     @MockBean
-    private JavaMailSender javaMailSender;
+    private EmailService emailService;
 
 
     @Test
@@ -51,7 +51,7 @@ class AccountControllerTest {
     void checkEmailToken_with_wrong_input() throws Exception {
         mockMvc.perform(get("/check-email-token")
                 .param("token", "asdfasdfaf")
-                .param("email", "ghkdgksmf13@naver.com"))
+                .param("templates/email", "ghkdgksmf13@naver.com"))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("error"))
                 .andExpect(view().name("account/checked-email"))
@@ -77,7 +77,7 @@ class AccountControllerTest {
 
         mockMvc.perform(get("/check-email-token")
                         .param("token", newAccount.getEmailCheckToken())
-                        .param("email", newAccount.getEmail()))
+                        .param("templates/email", newAccount.getEmail()))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeDoesNotExist("error"))
                 .andExpect(model().attributeExists("nickname"))
@@ -104,7 +104,7 @@ class AccountControllerTest {
     void signUpSubmitTest_withWorngInput() throws Exception{
         mockMvc.perform(post("/sign-up")
                         .param("nickname", "sky")
-                        .param("email", "ghkdgksmf13@naver.com")
+                        .param("templates/email", "ghkdgksmf13@naver.com")
                         .param("password", "1dd")
                         .with(csrf()))
                 .andExpect(status().isOk())
@@ -118,7 +118,7 @@ class AccountControllerTest {
         String mail = "ghkdkgksmf13@naver.com";
         mockMvc.perform(post("/sign-up")
                         .param("nickname", "sky")
-                        .param("email", mail)
+                        .param("templates/email", mail)
                         .param("password", "1dd3sd3td")
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())
@@ -129,6 +129,6 @@ class AccountControllerTest {
         assertNotNull(account);
         assertNotEquals(account.getPassword(), "1dd3sd3td");
         assertNotNull(account.getEmailCheckToken());
-        then(javaMailSender).should().send(any(SimpleMailMessage.class));
+        then(emailService).should().sendEmail(any(EmailMessage.class));
     }
 }

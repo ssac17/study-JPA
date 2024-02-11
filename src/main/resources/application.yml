@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: local
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -19,6 +19,10 @@ logging:
               sql:
                 BasicBinder : trace
 
+
+
+app:
+  host: http://localhost:8080
 
 
 

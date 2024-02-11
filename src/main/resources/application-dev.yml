@@ -4,12 +4,26 @@ spring:
     username: testuser
     password: 1234
 
-
+#mail
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
+  mail:
+    host: smtp.gmail.com
+    port: 465
+    username: ssac17@knou.ac.kr
+    password: jcayodqwofetfdez
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 10000
+          ssl:
+           enable: true
+
 
 logging:
   level:
     org.springframework.jdbc.datasource: DEBUG
+
 

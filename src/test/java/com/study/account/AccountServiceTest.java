@@ -1,14 +1,14 @@
 package com.study.account;
 
 import com.study.domain.Account;
+import com.study.email.EmailMessage;
+import com.study.email.EmailService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,7 +33,7 @@ class AccountServiceTest {
     private AccountRepository accountRepository;
 
     @MockBean
-    private JavaMailSender javaMailSender;
+    private EmailService emailService;
 
     @Test
     @DisplayName("회원 가입 처리 - 입력값 정상")
@@ -42,7 +42,7 @@ class AccountServiceTest {
         String password = "1dd3sd3td";
         mockMvc.perform(post("/sign-up")
                         .param("nickname", "sky")
-                        .param("email", mail)
+                        .param("templates/email", mail)
                         .param("password", password)
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())
@@ -51,7 +51,7 @@ class AccountServiceTest {
         Account account = accountRepository.findByEmail(mail);
         assertNotNull(account);
         assertNotEquals(account.getPassword(), password);
-        then(javaMailSender).should().send(any(SimpleMailMessage.class));
+        then(emailService).should().sendEmail(any(EmailMessage.class));
     }
 }
 
