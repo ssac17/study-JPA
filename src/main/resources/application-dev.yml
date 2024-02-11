@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/testdb
+    username: testuser
+    password: 1234
+
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+
+logging:
+  level:
+    org.springframework.jdbc.datasource: DEBUG
+

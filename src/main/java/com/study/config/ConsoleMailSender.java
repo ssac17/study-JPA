@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import java.io.InputStream;
 
 //@Profile: 특정 프로파일 환경에서만 특정 빈(Bean)이 등록되도록 지정
-@Profile("local")
+@Profile({"local", "dev"})
 @Component
 @Slf4j
 public class ConsoleMailSender implements JavaMailSender {
