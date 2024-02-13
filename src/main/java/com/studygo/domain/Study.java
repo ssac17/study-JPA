@@ -4,6 +4,8 @@ import com.studygo.account.UserAccount;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -79,5 +81,13 @@ public class Study {
 
     public boolean isManager(UserAccount userAccount) {
         return this.managers.contains(userAccount.getAccount());
+    }
+
+    public String getEncodedPath() {
+        return URLEncoder.encode(this.path, StandardCharsets.UTF_8);
+    }
+
+    public boolean isManagedBy(Account account) {
+        return this.getManagers().contains(account);
     }
 }

@@ -56,7 +56,18 @@
     $(function () {
         $("#username").val("sky");
         $("#password").val("123123123");
+
+        setTimeout(autoLogin, 300);
     })
+
+    function autoLogin() {
+        let username = $("#username").val();
+        let password = $("#password").val();
+        if(username !== "" && password !== "") {
+            $(".btn").click();
+        }
+    }
+
 </script>
 </body>
 </html>
