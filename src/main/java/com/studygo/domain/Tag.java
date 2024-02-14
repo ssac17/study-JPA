@@ -7,9 +7,8 @@ import jakarta.persistence.Id;
 import lombok.*;
 
 @Entity
-@Getter @Setter @Builder
-@NoArgsConstructor @AllArgsConstructor
-@EqualsAndHashCode(of = "id")
+@Getter @Setter @EqualsAndHashCode(of = "id")
+@Builder @AllArgsConstructor @NoArgsConstructor
 public class Tag {
 
     @Id

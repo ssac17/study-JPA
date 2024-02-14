@@ -40,7 +40,8 @@ public class SecurityConfig {
              //authorizeHttpRequests: HTTP 요청에 대한 접근 권한을 설정하는 데 사용
 
         http
-                .formLogin(page -> page.loginPage("/login").permitAll())
+                .formLogin(page -> page.loginPage("/login").permitAll()
+                        .defaultSuccessUrl("/"))
                 .logout(logout -> logout.logoutSuccessUrl("/"))
 
                 .rememberMe(remember -> remember.rememberMeParameter("rememberMe"))

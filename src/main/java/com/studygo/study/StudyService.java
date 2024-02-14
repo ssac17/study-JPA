@@ -2,6 +2,7 @@ package com.studygo.study;
 
 import com.studygo.domain.Account;
 import com.studygo.domain.Study;
+import com.studygo.domain.Tag;
 import com.studygo.study.event.StudyUpdateEvent;
 import com.studygo.study.form.StudyDescriptionForm;
 import lombok.RequiredArgsConstructor;
@@ -66,5 +67,20 @@ public class StudyService {
 
     public void disableStudyBanner(Study study) {
         study.setUseBanner(false);
+    }
+
+    public Study getStudyToUpdateTag(Account account, String path) {
+        Study study = studyRepository.findStudyWithTagsByPath(path);
+        checkIfExistingStudy(path, study);
+        checkIfManager(account, study);
+        return study;
+    }
+
+    public void addTag(Study study, Tag tag) {
+        study.getTags().add(tag);
+    }
+
+    public void removeTag(Study study, Tag tag) {
+        study.getTags().remove(tag);
     }
 }
