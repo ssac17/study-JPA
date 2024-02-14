@@ -3,6 +3,7 @@ package com.studygo.study;
 import com.studygo.domain.Account;
 import com.studygo.domain.Study;
 import com.studygo.domain.Tag;
+import com.studygo.domain.Zone;
 import com.studygo.study.event.StudyUpdateEvent;
 import com.studygo.study.form.StudyDescriptionForm;
 import lombok.RequiredArgsConstructor;
@@ -82,5 +83,20 @@ public class StudyService {
 
     public void removeTag(Study study, Tag tag) {
         study.getTags().remove(tag);
+    }
+
+    public void addZone(Study study, Zone zone) {
+        study.getZones().add(zone);
+    }
+
+    public void removeZone(Study study, Zone zone) {
+        study.getZones().remove(zone);
+    }
+
+    public Study getStudyToUpdateZone(Account account, String path) {
+        Study study = studyRepository.findStudyWithZonesByPath(path);
+        checkIfExistingStudy(path, study);
+        checkIfManager(account, study);
+        return study;
     }
 }

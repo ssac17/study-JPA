@@ -135,7 +135,6 @@
         </a>
     </nav>
 </div>
-
 <div th:fragment="study-settings-menu (currentMenu)" class="list-group">
     <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'description'}? active"
        href="#" th:href="@{'/study/' + ${study.path} + '/settings/description'}">소개</a>
@@ -178,6 +177,7 @@
 <div class="row" th:fragment="study-banner" th:if="${study.useBanner}" id="study-logo">
     <img th:src="${study.image}">
 </div>
+
 <div th:fragment="study-info">
     <div class="row pt-4 text-left justify-content-center bg-light">
         <div class="col-6">
@@ -237,11 +237,11 @@
                         <i class="fa fa-tag"></i> <span th:text="${tag.title}">Tag</span>
                     </a>
                 </span>
-                <span th:each="zone: ${study.zones}" class="font-weight-light text-monospace badge badge-primary mr-3">
-                    <a th:href="@{'/search/zone/' + ${zone.id}}" class="text-decoration-none text-white">
-                        <i class="fa fa-globe"></i> <span th:text="${zone.localNameOfCity}">City</span>
-                    </a>
-                </span>
+<!--                <span th:each="zone: ${study.zones}" class="font-weight-light text-monospace badge badge-primary mr-3">-->
+<!--                    <a th:href="@{'/search/zone/' + ${zone.id}}" class="text-decoration-none text-white">-->
+<!--                        <i class="fa fa-globe"></i> <span th:text="${zone.localNameOfCity}">City</span>-->
+<!--                    </a>-->
+<!--                </span>-->
             </p>
         </div>
     </div>
@@ -276,6 +276,7 @@
             }
 
             var tagInput = document.querySelector("#tags");
+
             var tagify = new Tagify(tagInput, {
                 pattern: /^.{0,20}$/,
                 whitelist: JSON.parse(document.querySelector("#whitelist").textContent),
@@ -292,6 +293,57 @@
         });
     </script>
 </div>
+
+<div th:fragment="update-zones (baseUrl)">
+    <script src="/node_modules/@yaireo/tagify/dist/tagify.min.js"></script>
+    <script type="application/javascript">
+        $(function () {
+            function tagRequest(url, zoneName) {
+                $.ajax({
+                    dataType: "json",
+                    autocomplete: {
+                        enabled: true,
+                        rightKey: true,
+                    },
+                    contentType: "application/json; charset=utf-8",
+                    method: "POST",
+                    url: "[(${baseUrl})]" + url,
+                    data: JSON.stringify({'zoneName': zoneName})
+                }).done(function (data, status) {
+                    console.log("${data} and status is ${status}");
+                });
+            }
+
+            function onAdd(e) {
+                tagRequest("/add", e.detail.data.value);
+            }
+
+            function onRemove(e) {
+                tagRequest("/remove", e.detail.data.value);
+            }
+
+            var tagInput = document.querySelector("#zones");
+
+            var tagify = new Tagify(tagInput, {
+                enforceWhitelist: true,
+                whitelist: JSON.parse(document.querySelector("#whitelist").textContent),
+                dropdown : {
+                    enabled: 1, // suggest tags after a single character input
+                    position: "text",
+                } // map tags
+            });
+
+            tagify.on("add", onAdd);
+            tagify.on("remove", onRemove);
+
+            // add a class to Tagify's input element
+            tagify.DOM.input.classList.add('form-control');
+            // re-place Tagify's input element outside of the  element (tagify.DOM.scope), just before it
+            tagify.DOM.scope.parentNode.insertBefore(tagify.DOM.input, tagify.DOM.scope);
+        });
+    </script>
+</div>
+
 
 
 <div th:fragment="member-list (members, isManager)" class="row px-3 justify-content-center">
